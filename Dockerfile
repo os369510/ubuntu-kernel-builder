@@ -64,8 +64,7 @@ RUN apt-get update && apt-get install -yqq \
 
 RUN apt --fix-broken install -y dkms
 RUN apt-get install -y linux-headers-4.15.0-46-generic
-RUN apt-get install -y linux-oem-headers-4.15.0-1035
-RUN apt-get install -y linux-oem-headers-4.15.0-1034
+RUN apt-get install -y linux-headers-4.15.0-1034-oem
 
 RUN useradd -ms /bin/bash ${User} && echo "${User}:${User}" | chpasswd && adduser ${User} sudo
 

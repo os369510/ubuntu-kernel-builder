@@ -2,7 +2,15 @@
 set -x
 function usage()
 {
-    echo "Usage: $0 docker [docker-image]"
+    echo "Usage: $(basename "$0") [Optional] Mandatory"
+    echo ""
+    echo "Mandatory:"
+    echo "  --img   Specify docker image."
+    echo ""
+    echo "Optional:"
+    echo "  --debug Keep STDIN open."
+    echo "  --pkg   Package to build."
+    echo ""
     exit 1
 }
 function check_docker_installed()
@@ -59,37 +67,53 @@ function get_same_container_num()
 STEPS=1
 
 WORK_DIR="Workspace"
-
 VOL_NAME="ubuntu-kernle-builder-work-area"
+DEBUG="no"
 
-case $1 in
-    docker)
-        if [ "$2" == "" ]; then
-            usage
-            exit -1
-        fi
-        DOCKER_BASE_NAME=${2#*/}
-        DOCKER_IMG=$2
-        VOL="$HOME/$WORK_DIR/$VOL_NAME"
-        order=0
+while [ -n "$1" ]; do
+    case "$1" in
+        --img)
+            IMG="$2"
+            shift 2;;
+        --pkg)
+            PKG="$2"
+            shift 2;;
+        --debug)
+            DEBUG="yes"
+            shift 1;;
+        *)
+            echo "ERROR: unknown option $1"
+            echo ""
+            usage;;
+    esac
+done
 
-        if [ ! -d $VOL ]; then
-            mkdir $VOL
-        fi
+if [ -z "$IMG" ]; then usage; fi
 
-        check_docker_installed res
-        [ "$res" -ne 0 ] && exit -1
+DOCKER_BASE_NAME=${IMG#*/}
+DOCKER_IMG=$IMG
+VOL="$HOME/$WORK_DIR/$VOL_NAME"
+order=0
 
-        check_docker_image_exist res
-        [ "$res" -ne 0 ] && exit -1
+if [ ! -d $VOL ]; then
+    mkdir $VOL
+fi
 
-        get_same_container_num order $DOCKER_BASE_NAME
-        order=$(($order+1))
-        DOCKER_NAME="${DOCKER_IMG//\//-}-$order"
+if [ -f "$PKG" ]; then
+    cp "$PKG" "$VOL"
+fi
 
-        docker run -it --rm -w /home/jeremysu -v $VOL:/home/jeremysu \
-        --privileged -v /dev/bus/usb:/dev/bus/usb --name $DOCKER_NAME $DOCKER_IMG
-        ;;
-    *)
-        usage
-esac
+check_docker_installed res
+[ "$res" -ne 0 ] && exit -1
+
+check_docker_image_exist res
+[ "$res" -ne 0 ] && exit -1
+
+get_same_container_num order $DOCKER_BASE_NAME
+order=$(($order+1))
+DOCKER_NAME="${DOCKER_IMG//\//-}-$order"
+
+if [ "$DEBUG" == "yes" ]; then
+    docker run -it --rm -w /home/jeremysu -v $VOL:/home/jeremysu --name $DOCKER_NAME $DOCKER_IMG
+else
+fi
