@@ -63,6 +63,7 @@ RUN apt-get update && apt-get install -yqq \
     ckermit
 
 RUN apt --fix-broken install -y dkms
+RUN apt-get install -y linux-headers-4.18.0-15-generic
 RUN apt-get install -y linux-headers-4.15.0-46-generic
 RUN apt-get install -y linux-headers-4.15.0-1034-oem
 
