@@ -116,5 +116,6 @@ DOCKER_NAME="${DOCKER_IMG//\//-}-$order"
 if [ "$DEBUG" == "yes" ]; then
     docker run -it --rm -w /home/jeremysu -v $VOL:/home/jeremysu --name $DOCKER_NAME $DOCKER_IMG
 else
-    docker run -it --rm -w /home/jeremysu -v $VOL:/home/jeremysu --name $DOCKER_NAME $DOCKER_IMG
+    docker run -t --rm -w /home/jeremysu -v $VOL:/home/jeremysu --name \
+    $DOCKER_NAME $DOCKER_IMG bash -c "sudo dpkg -i ~/*deb"
 fi

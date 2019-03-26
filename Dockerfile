@@ -68,6 +68,7 @@ RUN apt-get install -y linux-headers-4.15.0-46-generic
 RUN apt-get install -y linux-headers-4.15.0-1034-oem
 
 RUN useradd -ms /bin/bash ${User} && echo "${User}:${User}" | chpasswd && adduser ${User} sudo
+RUN echo "jeremysu ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/jeremysu
 
 RUN apt-get autoclean -yqq && \
     apt-get autoremove -yqq && \
