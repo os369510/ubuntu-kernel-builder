@@ -67,7 +67,7 @@ function get_same_container_num()
 STEPS=1
 
 WORK_DIR="Workspace"
-VOL_NAME="ubuntu-kernle-builder-work-area"
+VOL_NAME="ubuntu-kernel-builder-work-area"
 DEBUG="no"
 
 while [ -n "$1" ]; do
@@ -117,5 +117,5 @@ if [ "$DEBUG" == "yes" ]; then
     docker run -it --rm -w /home/jeremysu -v $VOL:/home/jeremysu --name $DOCKER_NAME $DOCKER_IMG
 else
     docker run -t --rm -w /home/jeremysu -v $VOL:/home/jeremysu --name \
-    $DOCKER_NAME $DOCKER_IMG bash -c "sudo dpkg -i ~/*deb"
+    $DOCKER_NAME $DOCKER_IMG bash -c "sudo dpkg -i ~/*deb 2>&1 | tee ~/dpkg-install.log && cp -r /var/lib/dkms ~/"
 fi
